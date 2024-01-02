@@ -1,4 +1,4 @@
-#define SOFTWARE_VERSION "N_231228"  //NyBoard + YYMMDD
+#define SOFTWARE_VERSION "FT_231218"
 //board configuration
 // -- comment out these blocks to save program space for your own codes --
 #define BUZZER 5
@@ -14,6 +14,8 @@
 #elif defined BITTLE
 #include "InstinctBittle.h"
 //#include "InstinctBittleShortExample.h"
+#elif defined ftBionicKit
+#include "InstinctftBionicKit.h"
 #endif
 
 #define DOF 16
@@ -64,6 +66,29 @@ int angleLimit[][2] = {
   { -80, 200 },
   { -80, 200 },
 };
+#elif defined ftBionicKit
+int8_t middleShift[] = {  0,  0,  0,  0,
+                          0,  0,  0,  0,
+                         30, 30,-30,-30,
+                         0, 0, 0, 0 };
+int angleLimit[][2] = {
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -90, 90 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+  { -270, 270 },
+};
 #else
 int8_t middleShift[] = { 0, 15, 0, 0,
                          -45, -45, -45, -45,
@@ -90,11 +115,15 @@ int angleLimit[][2] = {
 #endif
 
 // #define INVERSE_SERVO_DIRECTION
-int8_t rotationDirection[] = { 1, -1, 1, 1,
-                               1, -1, 1, -1,
-                               1, -1, -1, 1,
-                               -1, 1, 1, -1 };
-
+/*int8_t rotationDirection[] = { 1, -1, 1, 1,
+                                 1, -1, 1,-1,
+                                 1, -1,-1, 1,
+                                -1,  1, 1,-1 };
+*/
+int8_t rotationDirection[] = { 1, 1, 1, 1,
+                               1, 1, 1, 1,
+                               1,-1,-1, 1,
+                               1,-1,-1, 1 };
 
 #ifdef NyBoard_V0_1
 byte pwm_pin[] = { 7, 0, 15, 8,
@@ -115,6 +144,16 @@ byte pwm_pin[] = { 4, 3, 12, 11,
 #define LOW_VOLTAGE 440
 #define DEVICE_ADDRESS 0x50
 #define BAUD_RATE 57600
+
+#elif defined FtArduinoUno
+byte pwm_pin[] = { 4, 3, 8, 12,
+                   5, 2, 11, 15,
+                   6, 1, 10, 14,
+                   7, 0, 9, 13 };
+//#define VOLTAGE_DETECTION_PIN A0
+//#define LOW_VOLTAGE 440
+#define DEVICE_ADDRESS 0x50
+#define BAUD_RATE 115200
 
 #elif defined NyBoard_V1_0
 byte pwm_pin[] = { 12, 11, 4, 3,
@@ -170,6 +209,13 @@ byte pwm_pin[] = { 12, 11, 4, 3,
 #define REGULAR P1S
 #define KNEE P1S
 
+#elif defined ftBionicKit
+#define MODEL "fischertechnik Bionic Kit"
+#define FT_LEG
+#define WALKING_DOF 8
+#define REGULAR FTSERVO
+#define KNEE FTSERVO
+
 #endif
 
 //on-board EEPROM addresses
@@ -204,7 +250,6 @@ byte pwm_pin[] = { 12, 11, 4, 3,
 //token list
 #define T_ABORT 'a'      //abort the calibration values
 #define T_BEEP 'b'       //b note1 duration1 note2 duration2 ... e.g. b12 8 14 8 16 8 17 8 19 4
-                         //a single 'b' will toggle the melody on/off
 #define T_CALIBRATE 'c'  //send the robot to calibration posture for attaching legs and fine-tuning the joint offsets. \
                          //c jointIndex1 offset1 jointIndex2 offset2 ... e.g. c0 7 1 -4 2 3 8 5
 #define T_REST 'd'
@@ -243,10 +288,11 @@ byte pwm_pin[] = { 12, 11, 4, 3,
 #define BINARY_COMMAND  //disable the binary commands to save space for the simple random demo
 
 #ifdef BINARY_COMMAND
-#define T_BEEP_BIN 'B'  //B note1 duration1 note2 duration2 ... e.g. B12 8 14 8 16 8 17 8 19 4
+#define T_BEEP_BIN 'B'           //B note1 duration1 note2 duration2 ... e.g. B12 8 14 8 16 8 17 8 19 4 \
+                          //a single B will toggle the melody on/off
 #define T_LISTED_BIN 'L'         //a list of the DOFx joint angles: angle0 angle1 angle2 ... angle15
 // #define T_SERVO_MICROSECOND 'w'  //PWM width modulation
-#define T_TEMP 'T'  //call the last 'K' skill data received from the serial port
+#define T_TEMP 'T'               //call the last 'K' skill data received from the serial port
 #endif
 
 // #define T_TUNER '}'
@@ -262,7 +308,8 @@ int8_t servoCalib[DOF] = { 0, 0, 0, 0,
 #ifndef MAIN_SKETCH
 enum ServoModel_t {
   G41 = 0,
-  P1S
+  P1S,
+  FTSERVO
 };
 
 ServoModel_t servoModelList[] = {
@@ -328,7 +375,7 @@ bool servoOff = true;
 bool autoSwitch = true;
 #endif
 bool fineAdjust = true;
-bool gyroBalanceQ = true;
+bool gyroBalanceQ = false;
 bool printGyro = false;
 bool walkingQ = false;
 bool serialDominateQ = false;
@@ -511,7 +558,7 @@ void initRobot() {
 #ifdef DOUBLE_INFRARED_DISTANCE
   doubleInfraredDistanceSetup();
 #endif
-  skill.loadFrame("sit");  //required by double light
+  skill.loadFrame("up");  //required by double light
   delay(500);              //use your palm to cover the two light sensors for calibration
 #endif
   //----------------------------------

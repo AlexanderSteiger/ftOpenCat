@@ -38,19 +38,21 @@
 */
 
 #define MAIN_SKETCH  //the Petoi App only works when this mode is on
-// #define AUTO_INIT //automatically select 'Y' for the reset joint and IMU prompts
+//#define AUTO_INIT //automatically select 'Y' for the reset joint and IMU prompts
 // #define DEVELOPER //to print out some verbose debugging data
 // it may increase the code size and crash the bootloader.
 // make sure you know ISP and how to reset the bootloader!!!
 
-#define BITTLE  //Petoi 9 DOF robot dog: 1x on head + 8x on leg
+// #define BITTLE  //Petoi 9 DOF robot dog: 1x on head + 8x on leg
 // #define NYBBLE  //Petoi 11 DOF robot cat: 2x on head + 1x on tail + 8x on leg
+#define ftBionicKit  //fischertechnik cat 8 DOF 8x on leg
 
 // #define NyBoard_V0_1
 // #define NyBoard_V0_2
 // #define NyBoard_V1_0
 // #define NyBoard_V1_1
-#define NyBoard_V1_2
+// #define NyBoard_V1_2
+#define FtArduinoUno
 
 // you can also activate the following modes (they will disable the gyro to save programming space)
 // allowed combinations: RANDOM_MIND + ULTRASONIC, RANDOM_MIND, ULTRASONIC, VOICE, CAMERA
@@ -78,7 +80,7 @@
 // #define GROVE_SERIAL_PASS_THROUGH  //allow analog/digital read/write GPIO pins through serial protocol
 // #define OTHER_MODULES  //uncomment this line to disable the gyroscope code to save programming resources for other modules.
 
-#define IR_PIN 4  // Signal Pin of IR receiver to Arduino Digital Pin 4
+//#define IR_PIN 4  // Signal Pin of IR receiver to Arduino Digital Pin 4
 #include "src/OpenCat.h"
 
 void setup() {

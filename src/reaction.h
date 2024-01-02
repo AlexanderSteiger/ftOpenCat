@@ -310,10 +310,7 @@ void reaction() {
               }
 #endif
               else if (token == T_BEEP) {
-                if (inLen == 0)  //toggle the melody on/off
-                                 //the terminator of upper-case tokens is not '\n'. it may cause error when entered in the Arduino serial monitor
-                  EEPROM.update(BOOTUP_SOUND_STATE, !eeprom(BOOTUP_SOUND_STATE));
-                else if (target[1])
+                if (target[1])
                   beep(target[0], 1000 / target[1]);
               }
 
@@ -415,8 +412,13 @@ void reaction() {
         }
       case T_BEEP_BIN:
         {
-          for (byte b = 0; b < cmdLen / 2; b++)
-            beep(newCmd[2 * b], 1000 / newCmd[2 * b + 1]);
+          if (cmdLen < 2)  //toggle the melody on/off
+                           //the terminator of upper-case tokens is not '\n'. it may cause error when entered in the Arduino serial monitor
+            EEPROM.update(BOOTUP_SOUND_STATE, !eeprom(BOOTUP_SOUND_STATE));
+          else {
+            for (byte b = 0; b < cmdLen / 2; b++)
+              beep(newCmd[2 * b], 1000 / newCmd[2 * b + 1]);
+          }
           break;
         }
 #ifdef T_TEMP

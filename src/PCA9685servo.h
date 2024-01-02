@@ -95,6 +95,7 @@ public:
     //servo parameters
     ServoModel servoG41(180, SERVO_FREQ, 500, 2500);
     ServoModel servoP1S(270, SERVO_FREQ, 500, 2500);  //1s/4 = 250ms 250ms/2500us=100Hz
+    ServoModel servoFTSERVO(176, SERVO_FREQ, 620, 2380);
     for (int s = 0; s < numServo; s++) {
       ServoModel *model;
       switch (servoModelList[s]) {
@@ -103,6 +104,9 @@ public:
           break;
         case P1S:
           model = &servoP1S;
+          break;
+        case FTSERVO:
+          model = &servoFTSERVO;
           break;
       }
 

@@ -85,7 +85,7 @@ def makeDirectory(path):
 
 if platform.system() == "Windows":    # for Windows
     separation = '\\'
-    homeDri = os.getenv('HOMEDRIVE') 
+    homeDri = '.'#os.getenv('HOMEDRIVE') 
     homePath = os.getenv('HomePath') 
     configDir = homeDri + homePath
 else:  # for Linux & macOS

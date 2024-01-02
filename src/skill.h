@@ -512,6 +512,17 @@ int8_t expect[] = {
   19,
   -7,
 };
+#elif defined ftBionicKit
+int8_t expect[] = {
+  60,
+  60,
+  -60,
+  -60,
+  30,
+  30,
+  30,
+  30,
+};
 #endif
 
 int testEEPROM(char* skillData) {
