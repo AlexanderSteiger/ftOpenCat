@@ -514,14 +514,14 @@ int8_t expect[] = {
 };
 #elif defined ftBionicKit
 int8_t expect[] = {
-  60,
-  60,
+  0,
+  0,
   -60,
   -60,
-  30,
-  30,
-  30,
-  30,
+  -30,
+  -30,
+  -30,
+  -30,
 };
 #endif
 
